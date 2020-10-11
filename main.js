@@ -1,15 +1,15 @@
-const Discord = require("discord.js");
+const Discord = require('discord.js');
 const client = new Discord.Client();
 
-const cfg = require("./config");
+const cfg = require('./config');
 
 var lista = [];
 var listaafk = [];
 var msg;
 var ready = true;
 
-client.once("ready", () => {
-	console.log("Ready!");
+client.once('ready', () => {
+	console.log('Ready!');
 });
 
 var description = `
@@ -19,34 +19,34 @@ var description = `
 
 `;
 
-client.on("message", async (message) => {
+client.on('message', async (message) => {
 	if (
 		message.content.startsWith(cfg.prefix) &&
-		message.content.endsWith("ping") &&
+		message.content.endsWith('ping') &&
 		ready == true
 	) {
 		ready = false;
 
 		var embed = new Discord.MessageEmbed()
 			.setTitle(
-				"<:auselfreport:763026312117747782> Kto chętny na grę w **Among Us**? <:auselfreport:763026312117747782>"
+				'<:auselfreport:763026312117747782> Kto chętny na grę w **Among Us**? <:auselfreport:763026312117747782>'
 			)
 			.setColor(0xff0000)
 			.setDescription(description)
-			.setThumbnail("https://i.imgur.com/VdLgAxI.png");
+			.setThumbnail('https://i.imgur.com/VdLgAxI.png');
 
 		if (lista.length > 0 || listaafk.length > 0) {
 			msg.delete();
-			ludzie = "";
+			ludzie = '';
 			if (lista.length > 0) {
-				console.log("Lista: " + lista);
+				console.log('Lista: ' + lista);
 				ludzie += `*Osoby chętne do gry:*  **${lista.length}/10** \n`;
 				lista.forEach((item) => {
 					ludzie += `<@${item}>\n`;
 				});
 			}
 			if (listaafk.length > 0) {
-				console.log("ListaAFK: " + listaafk);
+				console.log('ListaAFK: ' + listaafk);
 				ludzie += `\n*Osoby chętne na później:*  **${listaafk.length}** \n`;
 				listaafk.forEach((item) => {
 					ludzie += `<@${item}>\n`;
@@ -56,7 +56,7 @@ client.on("message", async (message) => {
 			embed.setDescription(description + ludzie);
 		}
 
-		msg = await message.channel.send("<@&762726348057477180>", embed);
+		msg = await message.channel.send('<@&762726348057477180>', embed);
 
 		for (let o in cfg.emojiname) {
 			var n = [
@@ -77,13 +77,13 @@ client.on("message", async (message) => {
 
 		const collector = msg.createReactionCollector(filter);
 
-		collector.on("collect", (r, u) => {
+		collector.on('collect', (r, u) => {
 			//console.log(u.id + " clicked " + r.emoji.name);
 
 			var changed = false;
 
 			switch (r.emoji.name) {
-				case "aukill1":
+				case 'aukill1':
 					var pos = lista.indexOf(u.id);
 					var posafk = listaafk.indexOf(u.id);
 					if (pos < 0) {
@@ -95,7 +95,7 @@ client.on("message", async (message) => {
 						changed = true;
 					}
 					break;
-				case "klepsydra":
+				case 'klepsydra':
 					var pos = lista.indexOf(u.id);
 					var posafk = listaafk.indexOf(u.id);
 					if (pos >= 0) {
@@ -107,7 +107,7 @@ client.on("message", async (message) => {
 						changed = true;
 					}
 					break;
-				case "aukill2":
+				case 'aukill2':
 					var pos = lista.indexOf(u.id);
 					var posafk = listaafk.indexOf(u.id);
 					if (pos >= 0) {
@@ -125,7 +125,7 @@ client.on("message", async (message) => {
 
 			r.users.remove(u);
 
-			ludzie = "";
+			ludzie = '';
 
 			if (lista.length > 0) {
 				ludzie += `*Osoby chętne do gry:*  **${lista.length}/10** \n`;
@@ -142,13 +142,13 @@ client.on("message", async (message) => {
 
 			embed.setDescription(description + ludzie);
 
-			if (changed) msg.edit("<@&762726348057477180>", embed);
+			if (changed) msg.edit('<@&762726348057477180>', embed);
 
 			//console.log(lista);
 		});
 	} else if (
-		message.content.startsWith(cfg.prefix + "ping") &&
-		message.content.endsWith("end")
+		message.content.startsWith(cfg.prefix + 'ping') &&
+		message.content.endsWith('end')
 	) {
 		message.delete().catch(console.error);
 
@@ -157,7 +157,7 @@ client.on("message", async (message) => {
 			lista = [];
 			listaafk = [];
 		} else {
-			var temp = await message.channel.send("Co chcesz kończyć idioto??");
+			var temp = await message.channel.send('Co chcesz kończyć idioto??');
 			temp.delete({ timeout: 5000 });
 		}
 	}
