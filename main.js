@@ -1,7 +1,7 @@
 const Discord = require('discord.js');
 const client = new Discord.Client();
 const prefix = "!";
-const token = "12345"; //#gitignore
+const token = "12345"; //gitignore
 
 const emojiname = ["aukill1", "klepsydra", "aukill2"];
 
@@ -117,6 +117,8 @@ client.on('message', async message => {
 						changed = true;
 					}
 				break;
+			default: 
+				r.users.remove(u);
 		}
 
 		r.users.remove(u);
