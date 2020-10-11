@@ -1,5 +1,5 @@
 module.exports = Object.freeze({
-    prefix: "!",
-    token: "<secret_token_here>",
-    emojiname: ["aukill1", "klepsydra", "aukill2"]
-})
+	prefix: "!",
+	token: "NzY0NDUyNzEyMjIxNzY5NzM4.X4GeEQ.GrbYGW03lSBEkj3bHe6Bng8MAAU",
+	emojiname: ["aukill1", "klepsydra", "aukill2"],
+});
