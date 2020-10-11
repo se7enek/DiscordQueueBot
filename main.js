@@ -1,7 +1,7 @@
 const Discord = require('discord.js');
 const client = new Discord.Client();
 
-import 'config.js';
+const cfg = require("./config");
 
 var lista = [];
 var listaafk = [];
@@ -21,7 +21,7 @@ var description = `
 `;
 
 client.on('message', async message => {
-  if (message.content.startsWith(prefix) && message.content.endsWith("ping") && ready == true) {
+  if (message.content.startsWith(cfg.prefix) && message.content.endsWith("ping") && ready == true) {
 	
 	ready = false;
 
@@ -52,8 +52,8 @@ client.on('message', async message => {
 	msg = await message.channel.send("<@&762726348057477180>", embed);
 	
 
-	for (let o in emojiname) {
-		var n = [message.guild.emojis.cache.find(event => event.name == emojiname[o])];
+	for (let o in cfg.emojiname) {
+		var n = [message.guild.emojis.cache.find(event => event.name == cfg.emojiname[o])];
 		for (let o in n) await msg.react(n[o])
 	}
 
@@ -142,7 +142,7 @@ client.on('message', async message => {
 });
   }
 
-  else if (message.content.startsWith(prefix + "ping") && message.content.endsWith("end")) {
+  else if (message.content.startsWith(cfg.prefix + "ping") && message.content.endsWith("end")) {
 
 
 	message.delete().catch(console.error);
@@ -180,4 +180,4 @@ client.on('message', async message => {
             }
 });
 */
-client.login(token);
+client.login(cfg.token);
