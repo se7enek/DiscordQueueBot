@@ -1,7 +1,7 @@
 const Discord = require('discord.js');
 const client = new Discord.Client();
 const prefix = "!";
-const token = "NzY0NDUyNzEyMjIxNzY5NzM4.X4GeEQ.yOJUoI1t5ENtN61W4eo97HvWAqo";
+const token = "12345";
 
 const emojiname = ["aukill1", "klepsydra", "aukill2"];
 
