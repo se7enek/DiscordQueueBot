@@ -10,13 +10,6 @@ let ready = true;
 
 client.once('ready', () => console.log('Ready!'));
 
-const description = `
-<:aukill1:763025892414849055>   Jestem chętny!
-<:klepsydra:764483594465968158>   Tak ale nie teraz...
-<:aukill2:763025908554268682>   Wypisuję się ;(	
-
-`;
-
 const createMessage = (list, listAfk) => {
 	let ludzie = '';
 	if (list.length) {
@@ -30,23 +23,23 @@ const createMessage = (list, listAfk) => {
 		listAfk.forEach((item) => (ludzie += `<@${item}>\n`));
 	}
 
-	return description + ludzie;
+	return cfg.description + ludzie;
 };
 
 client.on('message', async (message) => {
 	if (
 		message.content.startsWith(cfg.prefix) &&
-		message.content.endsWith('ping') &&
+		message.content.endsWith(cfg.ping) &&
 		ready
 	) {
 		ready = false;
 
 		const embed = new Discord.MessageEmbed()
 			.setTitle(
-				'<:auselfreport:763026312117747782> Kto chętny na grę w **Among Us**? <:auselfreport:763026312117747782>'
+				'<:auselfreport:763026312117747782> Kto chętny na grę w **Among Us**? <:auselfreport:763026312117747782>',
 			)
 			.setColor(0xff0000)
-			.setDescription(description)
+			.setDescription(cfg.description)
 			.setThumbnail('https://i.imgur.com/VdLgAxI.png');
 
 		if (lista.length || listaafk.length) {
@@ -59,7 +52,7 @@ client.on('message', async (message) => {
 
 		cfg.reactions.map(async (reaction) => {
 			const emoji = message.guild.emojis.cache.find(
-				(emoji) => emoji.name === reaction
+				(emoji) => emoji.name === reaction,
 			);
 			await msg.react(emoji);
 		});
@@ -78,7 +71,7 @@ client.on('message', async (message) => {
 			let changed = false;
 
 			switch (reaction.emoji.name) {
-				case 'aukill1':
+				case 'auwhite':
 					if (position < 0) {
 						lista.push(user.id);
 						changed = true;
@@ -88,7 +81,7 @@ client.on('message', async (message) => {
 						changed = true;
 					}
 					break;
-				case 'klepsydra':
+				case 'aured':
 					if (position >= 0) {
 						lista.splice(position, 1);
 						changed = true;
@@ -98,7 +91,7 @@ client.on('message', async (message) => {
 						changed = true;
 					}
 					break;
-				case 'aukill2':
+				case 'aublackdead':
 					if (position >= 0) {
 						lista.splice(position, 1);
 						changed = true;
