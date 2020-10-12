@@ -1,10 +1,7 @@
 {
-	"config": {
-		"prefix": "!",
-		"ping": "ping",
-		"token": "secret",
-		"reactions": ["auwhite", "aured", "aublackdead"],
-		"description": "<:auwhite:762987306801430548> Jestem chętny!\n<:aured:762987298149105665> Tak, ale nie teraz...\n<:aublackdead:763038491994226729> Wypisuję się ;(\n\n"
-	}
+	"prefix": "!",
+	"ping": "ping",
+	"token": "secret",
+	"reactions": ["auwhite", "aured", "aublackdead"],
+	"description": "<:auwhite:762987306801430548> Jestem chętny!\n<:aured:762987298149105665> Tak, ale nie teraz...\n<:aublackdead:763038491994226729> Wypisuję się ;(\n\n"
 }
-

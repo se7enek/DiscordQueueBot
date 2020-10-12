@@ -1,5 +1,5 @@
 const Discord = require('discord.js');
-const cfg = require('./config').config;
+const cfg = require('./config');
 
 const client = new Discord.Client();
 
