@@ -3,23 +3,40 @@ const cfg = require('./config');
 
 const client = new Discord.Client();
 
-let lista = [];
-let listaafk = [];
+let listNow = [];
+let listLater = [];
 let msg;
 let ready = true;
 let changed = false;
 
-client.once('ready', () => console.log('Ready!'));
+const log = (info) => {
+	const now = new Date();
+	console.log(
+		`[${now
+			.getHours()
+			.toString()
+			.padStart(2, '0')}:${now
+			.getMinutes()
+			.toString()
+			.padStart(2, '0')}.${now
+			.getSeconds()
+			.toString()
+			.padStart(2, '0')}] ${info}`,
+	);
+};
 
 const createMessage = (list, listAfk) => {
+	changed && log(`Requested new ping message`);
 	let ludzie = '';
+	if (list.length || listAfk.length)
+		ludzie += `\n*Łącznie osób:* **${list.length + listAfk.length}/10**\n`;
 	if (list.length) {
-		console.log(`Lista: ${list}`);
-		ludzie += `*Osoby chętne do gry:*  **${list.length}/10** \n`;
+		log(`Lista: ${list}`);
+		ludzie += `\n*Osoby chętne do gry:*  **${list.length}/10** \n`;
 		list.forEach((item) => (ludzie += `<@${item}>\n`));
 	}
 	if (listAfk.length) {
-		console.log(`Lista AFK: ${listAfk}`);
+		log(`Lista AFK: ${listAfk}`);
 		ludzie += `\n*Osoby chętne na później:*  **${listAfk.length}** \n`;
 		listAfk.forEach((item) => (ludzie += `<@${item}>\n`));
 	}
@@ -29,21 +46,24 @@ const createMessage = (list, listAfk) => {
 
 const removeUser = (user, list) => {
 	const position = list.indexOf(user);
-	if (position > -1){
+	if (position > -1) {
+		log(`Removed user from list (${user})`);
 		list.splice(position, 1);
 		changed = true;
 	}
 };
 
 const addUser = (user, listAdd, listRemove) => {
-	
 	removeUser(user, listRemove);
 
 	if (listAdd.indexOf(user) == -1) {
+		log(`Added new user to list (${user})`);
 		listAdd.push(user);
 		changed = true;
 	}
 };
+
+client.once('ready', () => log(`Bot started & ready.`));
 
 client.on('message', async (message) => {
 	if (
@@ -61,9 +81,10 @@ client.on('message', async (message) => {
 			.setDescription(cfg.description)
 			.setThumbnail('https://i.imgur.com/VdLgAxI.png');
 
-		if (lista.length || listaafk.length) {
+		if (listNow.length || listLater.length) {
+			log('Refreshing ping message');
 			msg.delete();
-			embed.setDescription(createMessage(lista, listaafk));
+			embed.setDescription(createMessage(listNow, listLater));
 		}
 
 		// msg = await message.channel.send('<@&762726348057477180>', embed);
@@ -73,6 +94,7 @@ client.on('message', async (message) => {
 			const emoji = message.guild.emojis.cache.find(
 				(emoji) => emoji.name === reaction,
 			);
+			log(`Added reaction (${emoji}) to message`);
 			await msg.react(emoji);
 		});
 
@@ -85,29 +107,31 @@ client.on('message', async (message) => {
 		const collector = msg.createReactionCollector(filter);
 
 		collector.on('collect', (reaction, user) => {
-			
 			changed = false;
 
+			log(`User: ${user} clicked reaction: ${reaction.emoji.name}`);
+
 			switch (reaction.emoji.name) {
-				case 'auwhite':
-					addUser(user.id, lista, listaafk);
+				case cfg.reactions[0]:
+					addUser(user.id, listNow, listLater);
 					break;
-				case 'aured':
-					addUser(user.id, listaafk, lista);
+				case cfg.reactions[1]:
+					addUser(user.id, listLater, listNow);
 					break;
-				case 'aublackdead':
-					removeUser(user.id, lista);
-					removeUser(user.id, listaafk);
+				case cfg.reactions[2]:
+					removeUser(user.id, listNow);
+					removeUser(user.id, listLater);
 					break;
 			}
 
 			reaction.users.remove(user);
 
-			embed.setDescription(createMessage(lista, listaafk));
+			embed.setDescription(createMessage(listNow, listLater));
 
 			if (changed) {
 				// msg.edit('<@&762726348057477180>', embed);
 				msg.edit(embed);
+				log(`Message changed, editing...`);
 			}
 		});
 	} else if (
@@ -115,12 +139,14 @@ client.on('message', async (message) => {
 		message.content.endsWith('end')
 	) {
 		message.delete().catch(console.error);
+		log(`Removing ping message...`);
 
-		if (lista.length || listaafk.length || typeof msg !== 'undefined') {
+		if (listNow.length || listLater.length || typeof msg !== 'undefined') {
 			msg.delete().catch(console.error);
-			lista = [];
-			listaafk = [];
+			listNow = [];
+			listLater = [];
 		} else {
+			log(`No message found, omitting.`);
 			const temp = await message.channel.send('Brak aktywnej listy 🤦‍♂️');
 			temp.delete({ timeout: 5000 });
 		}
@@ -128,3 +154,4 @@ client.on('message', async (message) => {
 });
 
 client.login(cfg.token);
+log(`Logging in as: Among Ass`);
