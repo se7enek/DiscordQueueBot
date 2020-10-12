@@ -90,14 +90,14 @@ client.on('message', async (message) => {
 
 			switch (reaction.emoji.name) {
 				case 'auwhite':
-					addUser(user.id, lista);
+					addUser(user.id, lista, listaafk);
 					break;
 				case 'aured':
-					addUser(user.id, listaafk);
+					addUser(user.id, listaafk, lista);
 					break;
 				case 'aublackdead':
 					removeUser(user.id, lista);
-					removeUser(user.id, listaAfk);
+					removeUser(user.id, listaafk);
 					break;
 			}
 
