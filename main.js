@@ -7,6 +7,7 @@ let lista = [];
 let listaafk = [];
 let msg;
 let ready = true;
+let changed = false;
 
 client.once('ready', () => console.log('Ready!'));
 
@@ -24,6 +25,24 @@ const createMessage = (list, listAfk) => {
 	}
 
 	return cfg.description + ludzie;
+};
+
+const removeUser = (user, list) => {
+	const position = list.indexOf(user);
+	if (position > -1){
+		list.splice(position, 1);
+		changed = true;
+	}
+};
+
+const addUser = (user, listAdd, listRemove) => {
+	
+	removeUser(user, listRemove);
+
+	if (listAdd.indexOf(user) == -1) {
+		listAdd.push(user);
+		changed = true;
+	}
 };
 
 client.on('message', async (message) => {
@@ -47,8 +66,8 @@ client.on('message', async (message) => {
 			embed.setDescription(createMessage(lista, listaafk));
 		}
 
-		msg = await message.channel.send('<@&762726348057477180>', embed);
-		// msg = await message.channel.send(embed);
+		// msg = await message.channel.send('<@&762726348057477180>', embed);
+		msg = await message.channel.send(embed);
 
 		cfg.reactions.map(async (reaction) => {
 			const emoji = message.guild.emojis.cache.find(
@@ -66,40 +85,19 @@ client.on('message', async (message) => {
 		const collector = msg.createReactionCollector(filter);
 
 		collector.on('collect', (reaction, user) => {
-			const position = lista.indexOf(user.id);
-			const positionAfk = listaafk.indexOf(user.id);
-			let changed = false;
+			
+			changed = false;
 
 			switch (reaction.emoji.name) {
 				case 'auwhite':
-					if (position < 0) {
-						lista.push(user.id);
-						changed = true;
-					}
-					if (positionAfk >= 0) {
-						listaafk.splice(positionAfk, 1);
-						changed = true;
-					}
+					addUser(user.id, lista);
 					break;
 				case 'aured':
-					if (position >= 0) {
-						lista.splice(position, 1);
-						changed = true;
-					}
-					if (positionAfk < 0) {
-						listaafk.push(user.id);
-						changed = true;
-					}
+					addUser(user.id, listaafk);
 					break;
 				case 'aublackdead':
-					if (position >= 0) {
-						lista.splice(position, 1);
-						changed = true;
-					}
-					if (positionAfk >= 0) {
-						listaafk.splice(positionAfk, 1);
-						changed = true;
-					}
+					removeUser(user.id, lista);
+					removeUser(user.id, listaAfk);
 					break;
 			}
 
@@ -108,11 +106,9 @@ client.on('message', async (message) => {
 			embed.setDescription(createMessage(lista, listaafk));
 
 			if (changed) {
-				msg.edit('<@&762726348057477180>', embed);
+				// msg.edit('<@&762726348057477180>', embed);
+				msg.edit(embed);
 			}
-			// if (changed) {
-			// 	msg.edit(embed);
-			// }
 		});
 	} else if (
 		message.content.startsWith(cfg.prefix + 'ping') &&
