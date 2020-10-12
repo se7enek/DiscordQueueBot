@@ -1,33 +1,47 @@
 const Discord = require('discord.js');
-const client = new Discord.Client();
-
 const cfg = require('./config');
 
-var lista = [];
-var listaafk = [];
-var msg;
-var ready = true;
+const client = new Discord.Client();
 
-client.once('ready', () => {
-	console.log('Ready!');
-});
+let lista = [];
+let listaafk = [];
+let msg;
+let ready = true;
 
-var description = `
+client.once('ready', () => console.log('Ready!'));
+
+const description = `
 <:aukill1:763025892414849055>   Jestem chętny!
 <:klepsydra:764483594465968158>   Tak ale nie teraz...
 <:aukill2:763025908554268682>   Wypisuję się ;(	
 
 `;
 
+const createMessage = (list, listAfk) => {
+	let ludzie = '';
+	if (list.length) {
+		console.log(`Lista: ${list}`);
+		ludzie += `*Osoby chętne do gry:*  **${list.length}/10** \n`;
+		list.forEach((item) => (ludzie += `<@${item}>\n`));
+	}
+	if (listAfk.length) {
+		console.log(`Lista AFK: ${listAfk}`);
+		ludzie += `\n*Osoby chętne na później:*  **${listAfk.length}** \n`;
+		listAfk.forEach((item) => (ludzie += `<@${item}>\n`));
+	}
+
+	return description + ludzie;
+};
+
 client.on('message', async (message) => {
 	if (
 		message.content.startsWith(cfg.prefix) &&
 		message.content.endsWith('ping') &&
-		ready == true
+		ready
 	) {
 		ready = false;
 
-		var embed = new Discord.MessageEmbed()
+		const embed = new Discord.MessageEmbed()
 			.setTitle(
 				'<:auselfreport:763026312117747782> Kto chętny na grę w **Among Us**? <:auselfreport:763026312117747782>'
 			)
@@ -35,116 +49,77 @@ client.on('message', async (message) => {
 			.setDescription(description)
 			.setThumbnail('https://i.imgur.com/VdLgAxI.png');
 
-		if (lista.length > 0 || listaafk.length > 0) {
+		if (lista.length || listaafk.length) {
 			msg.delete();
-			ludzie = '';
-			if (lista.length > 0) {
-				console.log('Lista: ' + lista);
-				ludzie += `*Osoby chętne do gry:*  **${lista.length}/10** \n`;
-				lista.forEach((item) => {
-					ludzie += `<@${item}>\n`;
-				});
-			}
-			if (listaafk.length > 0) {
-				console.log('ListaAFK: ' + listaafk);
-				ludzie += `\n*Osoby chętne na później:*  **${listaafk.length}** \n`;
-				listaafk.forEach((item) => {
-					ludzie += `<@${item}>\n`;
-				});
-			}
-
-			embed.setDescription(description + ludzie);
+			embed.setDescription(createMessage(lista, listaafk));
 		}
 
 		msg = await message.channel.send('<@&762726348057477180>', embed);
+		// msg = await message.channel.send(embed);
 
-		for (let o in cfg.emojiname) {
-			var n = [
-				message.guild.emojis.cache.find(
-					(event) => event.name == cfg.emojiname[o]
-				),
-			];
-			for (let o in n) await msg.react(n[o]);
-		}
+		cfg.reactions.map(async (reaction) => {
+			const emoji = message.guild.emojis.cache.find(
+				(emoji) => emoji.name === reaction
+			);
+			await msg.react(emoji);
+		});
 
 		message.delete().catch(console.error);
 
 		ready = true;
 
-		const filter = (reaction, user) => {
-			return user.id !== msg.author.id;
-		};
+		const filter = (_reaction, user) => user.id !== msg.author.id;
 
 		const collector = msg.createReactionCollector(filter);
 
-		collector.on('collect', (r, u) => {
-			//console.log(u.id + " clicked " + r.emoji.name);
+		collector.on('collect', (reaction, user) => {
+			const position = lista.indexOf(user.id);
+			const positionAfk = listaafk.indexOf(user.id);
+			let changed = false;
 
-			var changed = false;
-
-			switch (r.emoji.name) {
+			switch (reaction.emoji.name) {
 				case 'aukill1':
-					var pos = lista.indexOf(u.id);
-					var posafk = listaafk.indexOf(u.id);
-					if (pos < 0) {
-						lista.push(u.id);
+					if (position < 0) {
+						lista.push(user.id);
 						changed = true;
 					}
-					if (posafk >= 0) {
-						listaafk.splice(posafk, 1);
+					if (positionAfk >= 0) {
+						listaafk.splice(positionAfk, 1);
 						changed = true;
 					}
 					break;
 				case 'klepsydra':
-					var pos = lista.indexOf(u.id);
-					var posafk = listaafk.indexOf(u.id);
-					if (pos >= 0) {
-						lista.splice(pos, 1);
+					if (position >= 0) {
+						lista.splice(position, 1);
 						changed = true;
 					}
-					if (posafk < 0) {
-						listaafk.push(u.id);
+					if (positionAfk < 0) {
+						listaafk.push(user.id);
 						changed = true;
 					}
 					break;
 				case 'aukill2':
-					var pos = lista.indexOf(u.id);
-					var posafk = listaafk.indexOf(u.id);
-					if (pos >= 0) {
-						lista.splice(pos, 1);
+					if (position >= 0) {
+						lista.splice(position, 1);
 						changed = true;
 					}
-					if (posafk >= 0) {
-						listaafk.splice(posafk, 1);
+					if (positionAfk >= 0) {
+						listaafk.splice(positionAfk, 1);
 						changed = true;
 					}
 					break;
-				default:
-					r.users.remove(u);
 			}
 
-			r.users.remove(u);
+			reaction.users.remove(user);
 
-			ludzie = '';
+			embed.setDescription(createMessage(lista, listaafk));
 
-			if (lista.length > 0) {
-				ludzie += `*Osoby chętne do gry:*  **${lista.length}/10** \n`;
-				lista.forEach((item) => {
-					ludzie += `<@${item}>\n`;
-				});
+			if (changed) {
+				msg.edit('<@&762726348057477180>', embed);
 			}
-			if (listaafk.length > 0) {
-				ludzie += `\n*Osoby chętne na później:*  **${listaafk.length}** \n`;
-				listaafk.forEach((item) => {
-					ludzie += `<@${item}>\n`;
-				});
-			}
-
-			embed.setDescription(description + ludzie);
-
-			if (changed) msg.edit('<@&762726348057477180>', embed);
-
-			//console.log(lista);
+			// if (changed) {
+			// 	msg.edit(embed);
+			// }
 		});
 	} else if (
 		message.content.startsWith(cfg.prefix + 'ping') &&
@@ -152,22 +127,15 @@ client.on('message', async (message) => {
 	) {
 		message.delete().catch(console.error);
 
-		if (lista.length > 0 || listaafk.length > 0) {
+		if (lista.length || listaafk.length || typeof msg !== 'undefined') {
 			msg.delete().catch(console.error);
 			lista = [];
 			listaafk = [];
 		} else {
-			var temp = await message.channel.send('Co chcesz kończyć idioto??');
+			const temp = await message.channel.send('Brak aktywnej listy 🤦‍♂️');
 			temp.delete({ timeout: 5000 });
 		}
 	}
 });
 
-/*for (let o in emojiname)
-            if (react.emoji.name == emojiname[o]) {
-                let i = react.message.guild.roles.find(react => react.name == rolename[o]);
-                event.message.guild.member(user).addRole(i).catch(console.error)
-            }
-});
-*/
 client.login(cfg.token);
