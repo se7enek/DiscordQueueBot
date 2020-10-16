@@ -1,7 +1,10 @@
 {
 	"prefix": "!",
 	"ping": "ping",
-	"token": "secret",
+	"token": "",
 	"reactions": ["auwhite", "aured", "aublackdead"],
-	"description": "<:auwhite:762987306801430548> Jestem chętny!\n<:aured:762987298149105665> Tak, ale nie teraz...\n<:aublackdead:763038491994226729> Wypisuję się ;(\n\n"
+	"description": "<:auwhite:762987306801430548> Jestem chętny!\n<:aured:762987298149105665> Tak, ale nie teraz...\n<:aublackdead:763038491994226729> Wypisuję się ;(\n\n",
+	"descriptionAFK": "<:auwhite:762987306801430548> Jestem chętny!\n<:aured:762987298149105665> Tak, ale nie teraz...\n<:aublackdead:763038491994226729> Wypisuję się ;(\n⏰ Wyślij PW do osób chętnych na później\n\n",
+	"descriptionREADY": "<:auwhite:762987306801430548> Jestem chętny!\n<:aured:762987298149105665> Tak, ale nie teraz...\n<:aublackdead:763038491994226729> Wypisuję się ;(\n📨 Wyślij PW o pełnym składzie!\n",
+	"group": "<@&762726348057477180>"
 }
